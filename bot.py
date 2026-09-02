@@ -12,6 +12,9 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 BINANCE_API_KEY = os.getenv("BINANCE_API_KEY", "")
 BINANCE_SECRET = os.getenv("BINANCE_API_SECRET", "")
 
+# Sadece senin Telegram ID'nin erişimine izin verilir
+ALLOWED_USER_ID = 5585878420
+
 exchange = ccxt.binance({
     'apiKey': BINANCE_API_KEY,
     'secret': BINANCE_SECRET,
@@ -59,6 +62,10 @@ def analyze_market(symbol="BTC/USDT", timeframe="1h"):
         return "ERROR", 0, 0
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ALLOWED_USER_ID:
+        await update.message.reply_text("⛔ **Erişim Reddedildi:** Bu bot kişiye özeldir.")
+        return
+
     await update.message.reply_text(
         "💎 **Profesyonel Algo-Trade Paneline Hoş Geldiniz!**\n\n"
         "Strateji: EMA Kesişimi + RSI Filtresi\n"
@@ -68,6 +75,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global bot_active
+
+    if update.effective_user.id != ALLOWED_USER_ID:
+        await update.message.reply_text("⛔ **Erişim Reddedildi:** Bu bot kişiye özeldir.")
+        return
+
     text = update.message.text
 
     if text == '📊 Bakiye & Fiyat':
